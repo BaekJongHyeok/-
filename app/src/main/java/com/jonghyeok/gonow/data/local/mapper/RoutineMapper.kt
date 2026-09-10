@@ -1,7 +1,9 @@
 package com.jonghyeok.gonow.data.local.mapper
 
+import com.google.android.libraries.places.api.model.DayOfWeek
 import com.jonghyeok.gonow.data.local.entity.RoutineEntity
 import com.jonghyeok.gonow.domain.model.Routine
+import kotlin.collections.joinToString
 
 fun Routine.toEntity(): RoutineEntity {
     return RoutineEntity(
@@ -16,6 +18,29 @@ fun Routine.toEntity(): RoutineEntity {
         lineName = subwayRoute.line.name,
         directionId = subwayRoute.direction.id,
         directionName = subwayRoute.direction.name,
+        walkingMinutes = walkingMinutes,
+        bufferMinutes = bufferMinutes,
+    )
+}
+
+fun RoutineEntity.toDomain(): Routine {
+    return Routine(
+        id = id,
+        name = name,
+        days = days
+            .split(",")
+            .map { DayOfWeek.valueOf(it) }
+            .toSet(),
+
+        startTime = LocalTime.of(startTimeMinutes / 60, startTimeMinutes % 60,),
+        endTime = LocalTime.of(endTimeMinutes / 60, endTimeMinutes % 60,),
+
+        subwayRoute = SubwayRoute(
+            station = Station(id = stationId, name = stationName,),
+            line = SubwayLine(id = lineId, name = lineName,),
+            direction = Direction(id = directionId, name = directionName,),
+        ),
+
         walkingMinutes = walkingMinutes,
         bufferMinutes = bufferMinutes,
     )
