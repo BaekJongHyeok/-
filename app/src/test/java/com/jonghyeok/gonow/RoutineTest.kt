@@ -1,5 +1,7 @@
 package com.jonghyeok.gonow
 
+import com.jonghyeok.gonow.data.local.mapper.toDomain
+import com.jonghyeok.gonow.data.local.mapper.toEntity
 import com.jonghyeok.gonow.domain.model.Direction
 import com.jonghyeok.gonow.domain.model.Routine
 import com.jonghyeok.gonow.domain.model.Station
@@ -457,5 +459,34 @@ class RoutineTest {
         assertEquals(LocalTime.of(8, 14), result?.arrivalTime)
     }
 
+    @Test
+    fun `Routine을 Entity로 변환했다가 다시 Domain으로 변환하면 원래 값과 같다`() {
+        // Given
+        val original = Routine(
+            id = "routine-1",
+            name = "출근",
+            days = setOf(
+                DayOfWeek.MONDAY,
+                DayOfWeek.TUESDAY,
+                DayOfWeek.WEDNESDAY,
+            ),
+            startTime = LocalTime.of(7, 50),
+            endTime = LocalTime.of(8, 40),
+            subwayRoute = SubwayRoute(
+                station = Station("station-1", "강남역"),
+                line = SubwayLine("line-2", "2호선"),
+                direction = Direction("direction-1", "잠실·성수 방면"),
+            ),
+            walkingMinutes = 8,
+            bufferMinutes = 2,
+        )
 
+        // When
+        val restored = original
+            .toEntity()
+            .toDomain()
+
+        // Then
+        assertEquals(original, restored)
+    }
 }
